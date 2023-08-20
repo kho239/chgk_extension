@@ -1,0 +1,41 @@
+{
+  "name": "Пилим тренировку",
+  "version": "0.4",
+  "description": "Сохраняем вопросы из базы данных",
+  "permissions": ["storage", "tabs", "downloads"],
+  "host_permissions": ["https://db.chgk.info/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://db.chgk.info/*"],
+      "js": ["contentScript.js"],
+      "css": ["style.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/bookmark.png",
+        "assets/play.png",
+        "assets/delete.png",
+        "assets/save.png"
+      ],
+      "matches": ["https://db.chgk.info/*"]
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "16": "assets/ext-icon.png",
+      "24": "assets/ext-icon.png",
+      "32": "assets/ext-icon.png"
+    },
+    "default_title": "Создание презентации",
+    "default_popup": "popup.html"
+  },
+  "sandbox": {
+    "pages": ["sandbox.html"]
+  },
+  "manifest_version": 3
+}
