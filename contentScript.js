@@ -19,6 +19,10 @@
     };
 
     const parseQuestionElement = (questionElement) => {
+        if (questionElement.getElementsByClassName("razdatka").length > 0) {
+            //return parseQuestionWithRazdatka(questionElement)
+        }
+
         const questionLink = fullLinkFromQuestion(questionElement);
         const questionTitle = questionLink.replace("https://db.chgk.info/question/", "");
         const questionFullText = questionElement.children[questionElement.children.length - 2].textContent;
@@ -54,6 +58,10 @@
             acceptedText: acceptedText,
             commentText: commentText
         };
+    }
+
+    const parseQuestionWithRazdatka = (questionElement) => {
+
     }
 
     const updateButtons = (questionElement) => {
@@ -105,6 +113,27 @@
         }
     };
 
+    function arrayMoveMutable(array, fromIndex, toIndex) {
+        const startIndex = fromIndex < 0 ? array.length + fromIndex : fromIndex;
+
+        if (startIndex >= 0 && startIndex < array.length) {
+            const endIndex = toIndex < 0 ? array.length + toIndex : toIndex;
+
+            const [item] = array.splice(fromIndex, 1);
+            array.splice(endIndex, 0, item);
+        }
+    }
+    function arrayMoveImmutable(array, fromIndex, toIndex) {
+        array = [...array];
+        arrayMoveMutable(array, fromIndex, toIndex);
+        return array;
+    }
+    const moveQuestion = async (fromIndex, toIndex) => {
+        currentSavedQuestions = await fetchQuestions();
+        currentSavedQuestions = arrayMoveImmutable(currentSavedQuestions, fromIndex, toIndex);
+        chrome.storage.local.set({["questions"]: JSON.stringify(currentSavedQuestions)});
+    }
+
     const newPageLoaded = () => {
 
         questionElements = document.getElementsByClassName("question");
@@ -146,9 +175,11 @@
                 newPageLoaded();
             } else if (type === "GIVE_UPDATE"){
                 sendResponse(currentSavedQuestions);
-
             } else if ( type === "DELETE") {
                 await deleteQuestion(value);
+                sendResponse(currentSavedQuestions);
+            } else if ( type === "MOVE") {
+                await moveQuestion(value.from, value.to);
                 sendResponse(currentSavedQuestions);
             }
         })();
